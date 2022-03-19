@@ -12,7 +12,7 @@
 class prods_cons_MT{
 public:
     prods_cons_MT();
-    prods_cons_MT(int myID, char PorC, int amount); // fuck you
+    prods_cons_MT(int myID, char PorC, int amount); //not used I believe
     void consume(); //function to preform consumption
     void produce(); //function to preform production
     int GetProdOrConNumber(); //retrieve what number producer or consumer it is
