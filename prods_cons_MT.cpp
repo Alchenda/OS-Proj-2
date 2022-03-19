@@ -8,7 +8,7 @@
 #include <fstream>
 #include "prods_cons_MT.hpp"
 
-//pretty sure this entire constructor is fucking useless lol
+//pretty sure this entire constructor is useless
 prods_cons_MT::prods_cons_MT(int myID, char PorC, int amount){
     prodOrConNumber = myID; //unique number for each producer/consumer
     ID = PorC; //identify if producer/consumer
