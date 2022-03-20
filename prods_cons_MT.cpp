@@ -28,7 +28,7 @@ void prods_cons_MT::produce(pthread_t prod){
     while(buffer.size() < bufferSize){
         buffer.push(randomProduce);
     }
-    prod -> wait(); //I think you can see what I am trying to do here, I am trying to get the producer just to wait. Going to be honest I have been at this for a few hours now and not sure how to get this to work
+    //prod -> wait(); //I think you can see what I am trying to do here, I am trying to get the producer just to wait. Going to be honest I have been at this for a few hours now and not sure how to get this to work
 }
 void prods_cons_MT::consume(pthread_t con){
     
