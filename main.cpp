@@ -10,26 +10,33 @@
 #include <mutex>
 #include <queue>
 #include <fstream>
-//#include "prods_cons_MT.cpp"
 #include <unistd.h>
-#include <condition_variable>
+//#include <condition_variable>
+#include "prods_cons_MTT.hpp"
 
 using namespace std;
 queue<int> buffer;
-mutex lock1;
+//mutex lock1;
 int bufferSize, pThread, cThread;
-condition_variable is_full;
-condition_variable is_empty;
+//condition_variable is_full;
+//condition_variable is_empty;
+pthread_cond_t NAME;
+pthread_mutex_t lock1;
+prods_cons_MTT MONITOR;
 
+/*void Produce();
+void Consumer();
+void *CreateProducer(void *prodArg);
+void *CreateConsumer(void *consArg);*/
 
 typedef struct {
     int threadNum;
 } threadID;
-
 void *CreateProducer(void *prodArg) {
 
     threadID *args = (threadID *) prodArg;
     cout << "P" << args->threadNum << ": Producing " << "CONST 4" << " values" << endl;
+    Produce();
     return nullptr;
 }
 
@@ -41,20 +48,13 @@ void *CreateConsumer(void *consArg) {
     return nullptr;
 }
 
-void Produce(){
-    lock1.lock();
-    //while(buffer is full){
-    //  wait(CV, lock1);
-    //}
-    //code to add item to buffer. All of the threads share a variable so will have to ask geiger
-    
-    
-}
+
 
 
 
 int main(int argc, const char * argv[]) {
-
+    pthread_cond_init(&NAME, NULL);
+    pthread_mutex_init(&lock1, NULL);
     threadID args = {-5};
 
     bufferSize = stoi(argv[1]); // size of buffer
