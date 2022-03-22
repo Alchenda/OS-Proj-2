@@ -93,6 +93,8 @@ int main(int argc, const char * argv[]) {
 
     //************ Thread Joining ***********
 
+    returnThread *rvals;
+
     for (int i = 0; i < pThread; ++i) { // join producers
         cout << "Main: producer " << i << " joined" << endl;
         pthread_join(producer, nullptr);
