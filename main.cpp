@@ -23,6 +23,10 @@ typedef struct {
     int threadNum;
 } threadID;
 
+typedef struct {
+    int threadReturn
+} returnThread;
+
 void *CreateProducer(void *prodArg) {
 
     threadID *args = (threadID *) prodArg;
@@ -34,9 +38,13 @@ void *CreateProducer(void *prodArg) {
 void *CreateConsumer(void *consArg) {
 
     threadID *args = (threadID *) consArg;
-    cout << "C" << args->threadNum << ": Consumer " << "CONST 3" << " values" << endl;
+    returnThread *rvals;
+    int id = args->threadNum;
 
-    return nullptr;
+    rvals->threadReturn = id;
+    cout << "C" << id << ": Consumer " << "CONST 3" << " values" << endl;
+
+    return (void *) rvals
 }
 
 
@@ -65,14 +73,10 @@ int main(int argc, const char * argv[]) {
 
 
 
-
-
-
-
-
     //****************** Thread Creation *******************
     //Right when an object is created it will begin consuming/producing right away
     for (int i = 0; i < pThread; ++i) { //create all of the producers
+
 
         args = {i};
         cout << "Main: started producer " << i << endl;
@@ -84,6 +88,25 @@ int main(int argc, const char * argv[]) {
         cout << "Main: started consumer " << i << endl;
         pthread_create(&consumer, nullptr, CreateConsumer, &args);
     }
+
+
+
+    //************ Thread Joining ***********
+
+    for (int i = 0; i < pThread; ++i) { // join producers
+        cout << "Main: producer " << i << " joined" << endl;
+        pthread_join(producer, nullptr);
+
+
+    }
+    for (int i = 0; i < cThread; ++i) { //join consumers
+        cout << "Main: consumer " << i << " joined" << endl;
+        pthread_join(consumer, (void **) &rvals); // &rvals still not recognized yet.
+
+    }
+
+    cout << "Main: program completed" << endl;
+
     sleep(1);
     return 0;
 }
