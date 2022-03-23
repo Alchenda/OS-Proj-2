@@ -9,14 +9,15 @@
 #include <pthread.h>
 #include <mutex>
 #include <queue>
+#include <assert.h>
 #include <fstream>
 #include "prods_cons_MT.cpp"
 #include <unistd.h>
 
 using namespace std;
-queue<int> buffer;
-mutex lock;
-int bufferSize, pThread, cThread;;
+
+int bufferSize, pThread, cThread;
+
 
 
 typedef struct {
@@ -24,12 +25,17 @@ typedef struct {
 } threadID;
 
 typedef struct {
-    int threadReturn
-} returnThread;
+    int threadReturnID;
+} threadReturnVals;
 
 void *CreateProducer(void *prodArg) {
 
     threadID *args = (threadID *) prodArg;
+    threadReturnVals *rvals = static_cast<threadReturnVals *>(malloc(sizeof(threadReturnVals)));
+    int id = args->threadNum;
+    assert(rvals != NULL);
+    rvals->threadReturnID = id;
+
     cout << "P" << args->threadNum << ": Producing " << "CONST 4" << " values" << endl;
 
     return nullptr;
@@ -38,43 +44,36 @@ void *CreateProducer(void *prodArg) {
 void *CreateConsumer(void *consArg) {
 
     threadID *args = (threadID *) consArg;
-    returnThread *rvals;
+    threadReturnVals *rvals = static_cast<threadReturnVals *>(malloc(sizeof(threadReturnVals)));
     int id = args->threadNum;
+    assert(rvals != NULL);
+    rvals->threadReturnID = id;
 
-    rvals->threadReturn = id;
     cout << "C" << id << ": Consumer " << "CONST 3" << " values" << endl;
 
-    return (void *) rvals
+    return (void *) rvals;
 }
 
 
-
-
-int main(int argc, const char * argv[]) {
+int main(int argc, char *argv[]) {
 
     threadID args = {-5};
+
+
 
     bufferSize = stoi(argv[1]); // size of buffer
     pThread = stoi(argv[2]); // number of producers to be produced
     cThread = stoi(argv[3]); //number of consumers to be produced
 
-    /*
-    //****************** Dynamic Memory Allocation *******************
-    prods_cons_MT *Producers; //Dynamic memory allocation of Producers
-    prods_cons_MT *Consumers; //Dynamic memory allocation of Consumers
-    pthread_t *prod; //Dynamic memory allocation for Producer Threads
-    pthread_t *con; //Dynamic memory allocation for Consumer Threads
-    Producers = new prods_cons_MT[pThread];  //create an array of the number of producers
-    Consumers = new prods_cons_MT[cThread]; //create an array of the number of consumers
-    prod = new pthread_t[pThread]; // create an array of producer threads
-    con = new pthread_t[cThread]; // create an array of consumer threads
-     */
-    pthread_t producer, consumer;
-
-
+    pthread_t p;
+    //myret_t *rvals;
+    //myarg_t args = { 10, 20 };
+    //pthread_create(&p, NULL, mythread, &args);
+    //pthread_join(p, (void **) &rvals);
 
     //****************** Thread Creation *******************
     //Right when an object is created it will begin consuming/producing right away
+    pthread_t producer, consumer;
     for (int i = 0; i < pThread; ++i) { //create all of the producers
 
 
@@ -89,15 +88,13 @@ int main(int argc, const char * argv[]) {
         pthread_create(&consumer, nullptr, CreateConsumer, &args);
     }
 
+//************ Thread Joining ***********
 
-
-    //************ Thread Joining ***********
-
-    returnThread *rvals;
+    threadReturnVals *rvals;
 
     for (int i = 0; i < pThread; ++i) { // join producers
         cout << "Main: producer " << i << " joined" << endl;
-        pthread_join(producer, nullptr);
+        pthread_join(producer, (void **) &rvals);
 
 
     }
@@ -109,6 +106,9 @@ int main(int argc, const char * argv[]) {
 
     cout << "Main: program completed" << endl;
 
-    sleep(1);
+    free(rvals);
+
+
+
     return 0;
 }
