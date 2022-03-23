@@ -60,7 +60,7 @@ int main(int argc, const char * argv[]) {
     pThread = stoi(argv[2]); // number of producers to be produced
     cThread = stoi(argv[3]); //number of consumers to be produced
 
-    
+
     pthread_t producer, consumer;
     //****************** Thread Creation *******************
     //Right when an object is created it will begin consuming/producing right away

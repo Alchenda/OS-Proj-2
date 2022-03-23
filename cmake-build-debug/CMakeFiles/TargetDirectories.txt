@@ -1,0 +1,3 @@
+/students/fmartine/CLionProjects/OS-Proj-2/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/students/fmartine/CLionProjects/OS-Proj-2/cmake-build-debug/CMakeFiles/edit_cache.dir
+/students/fmartine/CLionProjects/OS-Proj-2/cmake-build-debug/CMakeFiles/OS-Proj-2.dir

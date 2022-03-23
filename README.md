@@ -3,10 +3,7 @@
 
 ##Second group project for Operating Systems
 
-The purpose of OSProj2 is to provide a review FIXME
-
-
-
+The purpose of OSProj2 is to provide a review on multithreading and synchronization. This was done so by ultizing pthreads in order to create a multi-threaded version of the producer-consumer model. Additionally, a buffer will be used in order to manage the shared queue that takes place among the producer and consumer.
 
 ## Installation
 
@@ -18,10 +15,10 @@ The purpose of OSProj2 is to provide a review FIXME
 ```bash
 cd OS-Proj-2-master/cmake-build-debug
 ```
-5. Run the code by typing the following command in terminal.
+5. Run the code by typing the following command in terminal. The variables x, y, z represent the input value of the buffer size, producers and consumers. The minimal value needed is 1 while there is no defined maximum.
 
 ```bash
-./OS-Proj-2 
+./OS-Proj-2 x y z 
 ```
 
 ## Notes

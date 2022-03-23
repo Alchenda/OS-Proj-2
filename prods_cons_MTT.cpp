@@ -20,7 +20,7 @@ void Produce(int count){ //I think we need to pass the thread ID here for printi
     int randomNumber = rand() % (11);
     pthread_mutex_lock(&lock1);
     while(bufferSize == buffer.size()){
-        cout << "Producer is waiting" << endl;
+        cout << "Producer is waiting" << endl; // block to full buffer?
         pthread_cond_wait(&NAME, &lock1);
     }
     //critical section
@@ -31,6 +31,8 @@ void Produce(int count){ //I think we need to pass the thread ID here for printi
         cout << "producer x done producing" << endl;
     } else{
         Produce(count - 1);
+
+
     }
     
 
