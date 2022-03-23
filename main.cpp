@@ -22,7 +22,6 @@ int bufferSize, pThread, cThread;
 //condition_variable is_empty;
 pthread_cond_t NAME;
 pthread_mutex_t lock1;
-prods_cons_MTT MONITOR;
 
 /*void Produce();
 void Consumer();
@@ -36,7 +35,7 @@ void *CreateProducer(void *prodArg) {
 
     threadID *args = (threadID *) prodArg;
     cout << "P" << args->threadNum << ": Producing " << "CONST 4" << " values" << endl;
-    Produce();
+    Produce(bufferSize * 2);
     return nullptr;
 }
 
