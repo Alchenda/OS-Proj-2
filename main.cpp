@@ -34,8 +34,8 @@ typedef struct {
 void *CreateProducer(void *prodArg) {
 
     threadID *args = (threadID *) prodArg;
-    cout << "P" << args->threadNum << ": Producing " << "CONST 4" << " values" << endl;
-    Produce(bufferSize * 2);
+    cout << "P" << args->threadNum << ": Producing " << "CONST 2" << " values" << endl;
+    Produce(2);
     return nullptr;
 }
 
