@@ -36,7 +36,9 @@ typedef struct {
 void *CreateProducer(void *prodArg) {
 
     threadID *args = (threadID *) prodArg;
+    pthread_mutex_lock(&lock1);
     cout << "P" << args->threadNum << ": Producing " << (bufferSize * 2) << " values" << endl;
+    pthread_mutex_unlock(&lock1);
     int thready = args -> threadNum; //I hope it works how I think it works
     Produce(bufferSize * 2, thready);
     return nullptr;
@@ -47,14 +49,16 @@ void *CreateConsumer(void *consArg) {
     threadID *args = (threadID *) consArg;
     if (specialConsumer) { //this is the case for when there needs to be a special consumer that does extra
         extraConsume = ((bufferSize * 2) * pThread) % cThread; //total of production modulated with total consumers to get leftover produce
+        pthread_mutex_lock(&lock1);
         cout << "C" << args->threadNum << ": Consumer " << extraConsume << " values" << endl;
+        pthread_mutex_unlock(&lock1);
         int thready = args -> threadNum; //I hope this works how I think it works
-        Consumer(extraConsume, thready);
+        Consume(extraConsume, thready);
         return nullptr;
     } else{ //regular consumers
         cout << "C" << args->threadNum << ": Consumer " << cThread << " values" << endl;
         int thready = args -> threadNum; //I hope this works how I think it works
-        Consumer(cThread, thready);
+        Consume(cThread, thready);
     }
     
     return nullptr;
