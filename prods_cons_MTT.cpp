@@ -16,21 +16,23 @@ extern pthread_cond_t NAME;
 extern pthread_mutex_t lock1;
 extern queue<int> buffer;
 extern int bufferSize, pThread, cThread;
-void Produce(){ //I think we need to pass the thread ID here for printing purposes
-    int count = pThread;
+void Produce(int count){ //I think we need to pass the thread ID here for printing purposes
     int randomNumber = rand() % (11);
     pthread_mutex_lock(&lock1);
     while(bufferSize == buffer.size()){
+        cout << "Producer is waiting" << endl;
         pthread_cond_wait(&NAME, &lock1);
     }
     //critical section
     buffer.push(randomNumber);
     pthread_mutex_unlock(&lock1); //unlock the buffer
     pthread_cond_signal(&NAME); //wake the threads that are waiting to access the buffer
-    if (count > 0) {
-        count--;
-        Produce();
+    if(count == 0){
+        cout << "producer x done producing" << endl;
+    } else{
+        Produce(count - 1);
     }
+    
 
 }
 void Consume(){
