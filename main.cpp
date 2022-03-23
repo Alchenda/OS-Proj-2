@@ -17,7 +17,8 @@
 using namespace std;
 queue<int> buffer;
 //mutex lock1;
-int bufferSize, pThread, cThread;
+int bufferSize, pThread, cThread, qTrack, prodTrack, extraConsume;
+bool specialConsumer;
 //condition_variable is_full;
 //condition_variable is_empty;
 pthread_cond_t NAME;
@@ -27,23 +28,35 @@ pthread_mutex_t lock1;
 void Consumer();
 void *CreateProducer(void *prodArg);
 void *CreateConsumer(void *consArg);*/
-
+//**********Important please read the comment below, thank you!****************
+//please move all of this into the prods_cons_MTT.cpp file, it is not allowed to be in here for final submission.I think the only prototype missing is for the struct in the header file.
 typedef struct {
     int threadNum;
 } threadID;
 void *CreateProducer(void *prodArg) {
 
     threadID *args = (threadID *) prodArg;
-    cout << "P" << args->threadNum << ": Producing " << "CONST 2" << " values" << endl;
-    Produce(2);
+    cout << "P" << args->threadNum << ": Producing " << (bufferSize * 2) << " values" << endl;
+    int thready = args -> threadNum; //I hope it works how I think it works
+    Produce(bufferSize * 2, thready);
     return nullptr;
 }
 
 void *CreateConsumer(void *consArg) {
-
+    
     threadID *args = (threadID *) consArg;
-    cout << "C" << args->threadNum << ": Consumer " << "CONST 3" << " values" << endl;
-
+    if (specialConsumer) { //this is the case for when there needs to be a special consumer that does extra
+        extraConsume = ((bufferSize * 2) * pThread) % cThread; //total of production modulated with total consumers to get leftover produce
+        cout << "C" << args->threadNum << ": Consumer " << extraConsume << " values" << endl;
+        int thready = args -> threadNum; //I hope this works how I think it works
+        Consumer(extraConsume, thready);
+        return nullptr;
+    } else{ //regular consumers
+        cout << "C" << args->threadNum << ": Consumer " << cThread << " values" << endl;
+        int thready = args -> threadNum; //I hope this works how I think it works
+        Consumer(cThread, thready);
+    }
+    
     return nullptr;
 }
 
@@ -52,15 +65,18 @@ void *CreateConsumer(void *consArg) {
 
 
 int main(int argc, const char * argv[]) {
+    int qTrack = -1; //used for consumer thread position tracking
+    int prodTrack = -1; //used for producer thread position tracking
     pthread_cond_init(&NAME, NULL);
     pthread_mutex_init(&lock1, NULL);
     threadID args = {-5};
+    bool specialConsumer = false; //used for the consumer that should take extra consumptions
 
     bufferSize = stoi(argv[1]); // size of buffer
     pThread = stoi(argv[2]); // number of producers to be produced
     cThread = stoi(argv[3]); //number of consumers to be produced
 
-
+    
     pthread_t producer, consumer;
     //****************** Thread Creation *******************
     //Right when an object is created it will begin consuming/producing right away
@@ -74,6 +90,9 @@ int main(int argc, const char * argv[]) {
     for (int i = 0; i < cThread; ++i) { //create all of the consumers
         args = {i};
         cout << "Main: started consumer " << i << endl;
+        if (i == (cThread - 1)) {
+            specialConsumer = true;
+        }
         pthread_create(&consumer, nullptr, CreateConsumer, &args);
     }
     sleep(1);
