@@ -87,13 +87,17 @@ int main(int argc, const char * argv[]) {
     for (int i = 0; i < pThread; ++i) { //create all of the producers
 
         args = {i};
+        pthread_mutex_lock(&lock1);
         cout << "Main: started producer " << i << endl;
+        pthread_mutex_unlock(&lock1);
         pthread_create(&producer, nullptr, CreateProducer, &args);
     }
 
     for (int i = 0; i < cThread; ++i) { //create all of the consumers
         args = {i};
+        pthread_mutex_lock(&lock1);
         cout << "Main: started consumer " << i << endl;
+        pthread_mutex_unlock(&lock1);
         if (i == (cThread - 1)) {
             specialConsumer = true;
         }
