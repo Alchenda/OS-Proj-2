@@ -9,7 +9,7 @@
 #define prods_cons_MTT_hpp
 
 #include <stdio.h>
-void Produce();
+void Produce(int count);
 void Consumer();
 void *CreateProducer(void *prodArg);
 void *CreateConsumer(void *consArg);
