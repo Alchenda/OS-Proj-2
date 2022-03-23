@@ -14,23 +14,20 @@
 using namespace std;
 extern pthread_cond_t NAME;
 extern pthread_mutex_t lock1;
-extern queue<int> buffer;
+extern vector<int> buffer;
 extern int bufferSize, pThread, cThread;
 void Produce(int count){ //I think we need to pass the thread ID here for printing purposes
     int randomNumber = rand() % (11);
     pthread_mutex_lock(&lock1);
-    //cout << "count is = " << count << endl;
     while(bufferSize == buffer.size()){
         cout << "Producer is waiting" << endl;
         pthread_cond_wait(&NAME, &lock1);
     }
     //critical section
-    buffer.push(randomNumber);
+    buffer.push_back(randomNumber);
     pthread_mutex_unlock(&lock1); //unlock the buffer
     pthread_cond_signal(&NAME); //wake the threads that are waiting to access the buffer
-    if(count == 1){
-
-        //cout <<"count in critical section is = " << count << endl;
+    if(count == 0){
         cout << "producer x done producing" << endl;
     } else{
         Produce(count - 1);
@@ -46,4 +43,3 @@ void Consume(){
     //critical section
     pthread_mutex_unlock(&lock1);
 }
-
