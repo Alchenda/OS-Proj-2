@@ -22,4 +22,5 @@ cd OS-Proj-2-master/cmake-build-debug
 ```
 
 ## Notes
-This was run through X2GO in order to virtual test on Linux and tested in X2GO as well as MacOS 11.6.1.
+- This was run through X2GO in order to virtual test on Linux and tested in X2GO as well as MacOS 11.6.1.
+- There were some issues in regards to the printing of the producers in consumers while multithreading, and therefore some printing issues may occur, but most printing cases should work.
