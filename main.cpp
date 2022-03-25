@@ -10,7 +10,7 @@
 #include <queue>
 #include <fstream>
 #include <unistd.h>
-//#include <condition_variable>
+#include <condition_variable>
 #include "prods_cons_MTT.hpp"
 
 using namespace std;
@@ -20,6 +20,7 @@ int bufferSize, pThread, cThread, qTrack, prodTrack, extraConsume;
 bool specialConsumer;
 //condition_variable is_full;
 //condition_variable is_empty;
+pthread_cond_t IS_FULL, IS_EMPTY;
 pthread_cond_t NAME;
 pthread_mutex_t lock1;
 
@@ -53,7 +54,7 @@ void *CreateConsumer(void *consArg) {
         pthread_mutex_unlock(&lock1);
         int thready = args -> threadNum; //I hope this works how I think it works
         Consume(extraConsume, thready);
-        return nullptr;
+
     } else{ //regular consumers
         cout << "C" << args->threadNum << ": Consuming " << cThread << " values" << endl;
         int thready = args -> threadNum; //I hope this works how I think it works
@@ -102,6 +103,8 @@ int main(int argc, const char * argv[]) {
         }
         pthread_create(&consumer, nullptr, CreateConsumer, &args);
     }
+
+
     sleep(1);
     return 0;
 }

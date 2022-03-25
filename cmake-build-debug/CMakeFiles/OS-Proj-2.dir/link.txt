@@ -1,0 +1,1 @@
+/usr/bin/c++ -g CMakeFiles/OS-Proj-2.dir/main.cpp.o CMakeFiles/OS-Proj-2.dir/prods_cons_MTT.cpp.o -o OS-Proj-2  -pthread 
