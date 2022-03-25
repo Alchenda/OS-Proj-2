@@ -10,43 +10,101 @@
 #include <mutex>
 #include <queue>
 #include <fstream>
-#include "prods_cons_MT.cpp"
+#include <unistd.h>
+//#include <condition_variable>
+#include "prods_cons_MTT.hpp"
 
 using namespace std;
 queue<int> buffer;
-mutex lock;
-int bufferSize;
+//mutex lock1;
+int bufferSize, pThread, cThread, qTrack, prodTrack, extraConsume;
+bool specialConsumer;
+//condition_variable is_full;
+//condition_variable is_empty;
+pthread_cond_t IS_FULL, IS_EMPTY;
+pthread_mutex_t lock1;
+
+/*void Produce();
+void Consumer();
+void *CreateProducer(void *prodArg);
+void *CreateConsumer(void *consArg);*/
+//**********Important please read the comment below, thank you!****************
+//please move all of this into the prods_cons_MTT.cpp file, it is not allowed to be in here for final submission.I think the only prototype missing is for the struct in the header file.
+typedef struct {
+    int threadNum;
+} threadID;
+void *CreateProducer(void *prodArg) {
+
+    threadID *args = (threadID *) prodArg;
+    pthread_mutex_lock(&lock1);
+    cout << "P" << args->threadNum << ": Producing " << (bufferSize * 2) << " values" << endl;
+    pthread_mutex_unlock(&lock1);
+    int thready = args -> threadNum; //I hope it works how I think it works
+    Produce(bufferSize * 2, thready);
+    return nullptr;
+}
+
+void *CreateConsumer(void *consArg) {
+    int consumeAmount = 0;
+    threadID *args = (threadID *) consArg;
+    if (specialConsumer) { //this is the case for when there needs to be a special consumer that does extra
+        consumeAmount = (((bufferSize * 2) * pThread) % cThread) + ((bufferSize * 2) * pThread) / cThread; //total of production modulated with total consumers to get leftover produce
+        pthread_mutex_lock(&lock1);
+        cout << "C" << args->threadNum << ": Consume " << consumeAmount << " values" << endl;
+        pthread_mutex_unlock(&lock1);
+        int thready = args -> threadNum; //I hope this works how I think it works
+        Consume(extraConsume, thready);
+        return nullptr;
+    } else{ //regular consumers
+        consumeAmount = ((bufferSize * 2) * pThread) / cThread;
+        cout << "C" << args->threadNum << ": Consume " << consumeAmount << " values" << endl;
+        int thready = args -> threadNum; //I hope this works how I think it works
+        Consume(cThread, thready);
+    }
+    
+    return nullptr;
+}
+
+
+
+
 
 int main(int argc, const char * argv[]) {
-    int pThread, cThread;
+    int qTrack = -1; //used for consumer thread position tracking
+    int prodTrack = -1; //used for producer thread position tracking
+    pthread_cond_init(&IS_FULL, NULL);
+    pthread_cond_init(&IS_EMPTY, NULL);
+    pthread_mutex_init(&lock1, NULL);
+    threadID args = {-5};
+    bool specialConsumer = false; //used for the consumer that should take extra consumptions
+
     bufferSize = stoi(argv[1]); // size of buffer
-    pThread = stoi(argv[2]); // umber of producers to be produced
+    pThread = stoi(argv[2]); // number of producers to be produced
     cThread = stoi(argv[3]); //number of consumers to be produced
-    //****************** Dynamic Memory Allocation *******************
-    prods_cons_MT *Producers; //Dynamic memory allocation of Producers
-    prods_cons_MT *Consumers; //Dynamic memory allocation of Consumers
-    pthread_t *prod; //Dynamic memory allocation for Producer Threads
-    pthread_t *con; //Dynamic memory allocation for Consumer Threads
-    Producers = new prods_cons_MT[pThread];  //create an array of the number of producers
-    Consumers = new prods_cons_MT[cThread]; //create an array of the number of consumers
-    prod = new pthread_t[pThread]; // create an array of producer threads
-    con = new pthread_t[cThread]; // create an array of consumer threads
-    //****************** Object Creation *******************
+
+    
+    pthread_t producer, consumer;
+    //****************** Thread Creation *******************
     //Right when an object is created it will begin consuming/producing right away
     for (int i = 0; i < pThread; ++i) { //create all of the producers
-        Producers[i].SetID(i); //which number the producer is
-        Producers[i].SetAmount(bufferSize * 2); //this is to ensure over production
-        Producers[i].SetProdOrCon('P'); //indicate it is a producer
-        cout << "Main: started producer " << i;
-        Producers[i].ProducerStartPrint();
-        Producers[i].produce(prod[i]); //producer thread begins production
+
+        args = {i};
+        pthread_mutex_lock(&lock1);
+        cout << "Main: started producer " << i << endl;
+        pthread_mutex_unlock(&lock1);
+        pthread_create(&producer, nullptr, CreateProducer, &args);
     }
-    for (int i = 0; i < cThread; ++i){ //create all of the consumers
-        Consumers[i].SetID(i); //which number the consumer is
-        Consumers[i].SetAmount(cThread); //amount to consume
-        Consumers[i].SetProdOrCon('C'); //indicate it is a consumer
-        cout << "Main: started consumer " << i;
-        Consumers[i].consume(con[i]); //consumer thread begins consuming
+
+    for (int i = 0; i < cThread; ++i) { //create all of the consumers
+        args = {i};
+        pthread_mutex_lock(&lock1);
+        cout << "Main: started consumer " << i << endl;
+        pthread_mutex_unlock(&lock1);
+        if (i == (cThread - 1)) { //last thread is responsible for special consumption
+            specialConsumer = true;
+        }
+        pthread_create(&consumer, nullptr, CreateConsumer, &args);
     }
+    sleep(1);
     return 0;
 }
