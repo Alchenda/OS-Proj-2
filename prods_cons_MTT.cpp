@@ -16,8 +16,46 @@ extern pthread_cond_t IS_EMPTY, IS_FULL;
 extern pthread_cond_t NAME;
 extern pthread_mutex_t lock1;
 extern queue<int> buffer;
+//extern struct threadID;
 extern int bufferSize, pThread, cThread, qTrack, prodTrack, extraConsume;
 extern bool specialConsumer;
+
+typedef struct {
+    int threadNum;
+} threadID;
+
+void *CreateProducer(void *prodArg) {
+
+    threadID *args = (threadID *) prodArg;
+    pthread_mutex_lock(&lock1);
+    cout << "P" << args->threadNum << ": Producing " << (bufferSize * 2) << " values" << endl;
+    pthread_mutex_unlock(&lock1);
+    int thready = args -> threadNum; //I hope it works how I think it works
+    Produce(bufferSize * 2, thready);
+    return nullptr;
+}
+
+void *CreateConsumer(void *consArg) {
+
+    threadID *args = (threadID *) consArg;
+    if (specialConsumer) { //this is the case for when there needs to be a special consumer that does extra
+        extraConsume = ((bufferSize * 2) * pThread) % cThread; //total of production modulated with total consumers to get leftover produce
+        pthread_mutex_lock(&lock1);
+        cout << "C" << args->threadNum << ": Consuming " << extraConsume << " values" << endl;
+        pthread_mutex_unlock(&lock1);
+        int thready = args -> threadNum; //I hope this works how I think it works
+        Consume(extraConsume, thready);
+
+    } else{ //regular consumers
+        cout << "C" << args->threadNum << ": Consuming " << cThread << " values" << endl;
+        int thready = args -> threadNum; //I hope this works how I think it works
+        Consume(cThread, thready);
+    }
+
+    return nullptr;
+}
+
+
 
 void Produce(int count, int threadNum){
     prodTrack = (prodTrack + 1) % (bufferSize + 1); //I believe these should be the same algorithm for tracking the que rotation position

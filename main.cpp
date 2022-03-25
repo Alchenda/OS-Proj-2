@@ -24,54 +24,15 @@ pthread_cond_t IS_FULL, IS_EMPTY;
 pthread_cond_t NAME;
 pthread_mutex_t lock1;
 
-/*void Produce();
-void Consumer();
-void *CreateProducer(void *prodArg);
-void *CreateConsumer(void *consArg);*/
-//**********Important please read the comment below, thank you!****************
-//please move all of this into the prods_cons_MTT.cpp file, it is not allowed to be in here for final submission.I think the only prototype missing is for the struct in the header file.
 typedef struct {
     int threadNum;
 } threadID;
-void *CreateProducer(void *prodArg) {
-
-    threadID *args = (threadID *) prodArg;
-    pthread_mutex_lock(&lock1);
-    cout << "P" << args->threadNum << ": Producing " << (bufferSize * 2) << " values" << endl;
-    pthread_mutex_unlock(&lock1);
-    int thready = args -> threadNum; //I hope it works how I think it works
-    Produce(bufferSize * 2, thready);
-    return nullptr;
-}
-
-void *CreateConsumer(void *consArg) {
-    
-    threadID *args = (threadID *) consArg;
-    if (specialConsumer) { //this is the case for when there needs to be a special consumer that does extra
-        extraConsume = ((bufferSize * 2) * pThread) % cThread; //total of production modulated with total consumers to get leftover produce
-        pthread_mutex_lock(&lock1);
-        cout << "C" << args->threadNum << ": Consuming " << extraConsume << " values" << endl;
-        pthread_mutex_unlock(&lock1);
-        int thready = args -> threadNum; //I hope this works how I think it works
-        Consume(extraConsume, thready);
-
-    } else{ //regular consumers
-        cout << "C" << args->threadNum << ": Consuming " << cThread << " values" << endl;
-        int thready = args -> threadNum; //I hope this works how I think it works
-        Consume(cThread, thready);
-    }
-    
-    return nullptr;
-}
-
-
-
-
 
 int main(int argc, const char * argv[]) {
     int qTrack = -1; //used for consumer thread position tracking
     int prodTrack = -1; //used for producer thread position tracking
-    pthread_cond_init(&NAME, NULL);
+    pthread_cond_init(&IS_FULL, NULL);
+    pthread_cond_init(&IS_EMPTY, NULL);
     pthread_mutex_init(&lock1, NULL);
     threadID args = {-5};
     bool specialConsumer = false; //used for the consumer that should take extra consumptions
