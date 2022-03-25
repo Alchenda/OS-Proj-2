@@ -1,8 +1,7 @@
 //
 //  main.cpp
-//  OSProj2
-//
-//  Created by Danny Webb-McClain on 3/17/22.
+// OS-Proj-2
+// Danny Webb-McClain and Florinda Martinez
 //
 
 #include <iostream>
@@ -50,13 +49,13 @@ void *CreateConsumer(void *consArg) {
     if (specialConsumer) { //this is the case for when there needs to be a special consumer that does extra
         extraConsume = ((bufferSize * 2) * pThread) % cThread; //total of production modulated with total consumers to get leftover produce
         pthread_mutex_lock(&lock1);
-        cout << "C" << args->threadNum << ": Consumer " << extraConsume << " values" << endl;
+        cout << "C" << args->threadNum << ": Consuming " << extraConsume << " values" << endl;
         pthread_mutex_unlock(&lock1);
         int thready = args -> threadNum; //I hope this works how I think it works
         Consume(extraConsume, thready);
         return nullptr;
     } else{ //regular consumers
-        cout << "C" << args->threadNum << ": Consumer " << cThread << " values" << endl;
+        cout << "C" << args->threadNum << ": Consuming " << cThread << " values" << endl;
         int thready = args -> threadNum; //I hope this works how I think it works
         Consume(cThread, thready);
     }

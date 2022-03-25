@@ -1,8 +1,8 @@
 //
 //  prods_cons_MTT.cpp
 //  remakeeeee
-//
-//  Created by Danny Webb-McClain on 3/22/22.
+//OS-Proj-2
+//Danny Webb-McClain and Florinda Martinez
 //
 #include <iostream>
 #include <pthread.h>
@@ -23,7 +23,8 @@ void Produce(int count, int threadNum){
     int randomNumber = rand() % (11); //can be changed for true random up to you
     pthread_mutex_lock(&lock1);
     while(bufferSize == buffer.size()){
-        cout << "Producer " << threadNum << " is waiting" << endl;
+        cout << "P" << threadNum << ": Blocked due to full buffer" << endl;
+        //cout << "Producer " << threadNum << " is waiting" << endl;
         pthread_cond_wait(&NAME, &lock1);
     }
     //critical section
@@ -32,7 +33,8 @@ void Produce(int count, int threadNum){
     pthread_mutex_unlock(&lock1); //unlock the buffer
     pthread_cond_signal(&NAME); //wake the threads that are waiting to access the buffer
     if(count == 0){
-        cout << "producer x done producing" << endl;
+        cout << "P" << threadNum << ": Done waiting on full buffer" << endl;
+        //cout << "producer x done producing" << endl;
     } else{
         Produce(count - 1, threadNum);
     }
@@ -44,7 +46,8 @@ void Consume(int count, int threadNum){
     pthread_mutex_lock(&lock1);
     while (buffer.empty() == true) {
         pthread_cond_wait(&NAME, &lock1);
-        cout << "Consumer x is waiting" << endl;
+        cout << "C" << threadNum << ": Blocked due to empty buffer" << endl;
+        //cout << "Consumer x is waiting" << endl;
     }
     //critical section
     cout << "C" << threadNum << ": Reading " << buffer.front() << " from position " << qTrack << endl;
@@ -53,7 +56,9 @@ void Consume(int count, int threadNum){
     pthread_cond_signal(&NAME); //wake the threads that are waiting to access the buffer
     
     if (count == 0) {
+        pthread_mutex_lock(&lock1);
         cout << "Consumer " << threadNum << " done consuming" << endl;
+        pthread_mutex_unlock(&lock1);
     } else{
         Consume(count - 1, threadNum);
     }
